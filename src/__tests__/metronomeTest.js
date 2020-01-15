@@ -3,6 +3,8 @@ import {
   accent,
   bpm,
   count,
+  start,
+  stop,
   updateAccent,
   updateBpm
 } from '../interactions'
@@ -20,6 +22,21 @@ describe('Metronome', () => {
     it('is set to a BPM of 120', () => {
       const store = createStore()
       expect(bpm(store.getState())).toEqual(120)
+    })
+  })
+
+  describe('running', () => {
+    it('can be started', () => {
+      const store = createStore()
+      store.dispatch(start())
+      expect(count(store.getState())).toEqual(1)
+    })
+
+    it('can be stopped', () => {
+      const store = createStore()
+      store.dispatch(start())
+      store.dispatch(stop())
+      expect(count(store.getState())).toEqual(undefined)
     })
   })
 
