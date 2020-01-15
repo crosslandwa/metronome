@@ -1,8 +1,14 @@
 import createStore from '../store'
 import {
   accent,
+  accentDisplay,
   bpm,
+  bpmDisplay,
   count,
+  editAccent,
+  editBpm,
+  resetAccent,
+  resetBpm,
   start,
   stop,
   updateAccent,
@@ -41,9 +47,26 @@ describe('Metronome', () => {
   })
 
   describe('accent', () => {
+    it('can be edited without commiting a change', () => {
+      const store = createStore()
+      store.dispatch(editAccent(3))
+      expect(accentDisplay(store.getState())).toEqual(3)
+      expect(accentDisplay(store.getState())).not.toEqual(accent(store.getState()))
+    })
+
+    it('can be edited and reset without commiting a change', () => {
+      const store = createStore()
+      store.dispatch(editAccent(3))
+      expect(accentDisplay(store.getState())).not.toEqual(accent(store.getState()))
+
+      store.dispatch(resetAccent())
+      expect(accentDisplay(store.getState())).toEqual(accent(store.getState()))
+    })
+
     it('can be updated', () => {
       const store = createStore()
       store.dispatch(updateAccent(3))
+      expect(accentDisplay(store.getState())).toEqual(3)
       expect(accent(store.getState())).toEqual(3)
     })
 
@@ -59,10 +82,29 @@ describe('Metronome', () => {
   })
 
   describe('bpm', () => {
+    it('can be edited without commiting a change', () => {
+      const store = createStore()
+      store.dispatch(editBpm(130))
+      const display = bpmDisplay(store.getState())
+
+      expect(display).toEqual(130)
+      expect(display).not.toEqual(bpm(store.getState()))
+    })
+
+    it('can be edited and reset without commiting a change', () => {
+      const store = createStore()
+      store.dispatch(editBpm(130))
+      expect(bpmDisplay(store.getState())).not.toEqual(bpm(store.getState()))
+
+      store.dispatch(resetBpm())
+      expect(bpmDisplay(store.getState())).toEqual(bpm(store.getState()))
+    })
+
     it('can be updated', () => {
       const store = createStore()
       store.dispatch(updateBpm(130))
       expect(bpm(store.getState())).toEqual(130)
+      expect(bpmDisplay(store.getState())).toEqual(130)
     })
 
     it('is bound between 20 and 300', () => {

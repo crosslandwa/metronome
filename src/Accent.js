@@ -1,19 +1,30 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { accent, updateAccent } from './interactions'
+import { accent, accentDisplay, editAccent, resetAccent, updateAccent } from './interactions'
 
 const mapStateToProps = state => ({
-  accent: accent(state)
+  accent: accentDisplay(state),
+  uncommited: accentDisplay(state) !== accent(state)
 })
 
 const mapDispatchToProps = dispatch => ({
-  updateAccent: e => dispatch(updateAccent(e.target.value))
+  edit: e => dispatch(editAccent(e.target.value)),
+  reset: () => dispatch(resetAccent()),
+  update: e => e.keyCode === 13 && dispatch(updateAccent(e.target.value))
 })
 
-const Accent = ({ accent, updateAccent }) => (
+const Accent = ({ accent, edit, reset, uncommited, update }) => (
   <label>
     <span>Accent</span>
-    <input type="number" value={accent} name="accent" min="1" max="16" onChange={updateAccent}/>
+    <input
+      class={uncommited && 'input--uncommited'}
+      type="number"
+      value={accent}
+      name="accent"
+      onKeyUp={update}
+      onChange={edit}
+      onBlur={reset}
+    />
   </label>
 )
 
