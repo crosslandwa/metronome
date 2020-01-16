@@ -10,11 +10,29 @@ const mapDispatchToProps = dispatch => ({
   toggle: started => dispatch(started ? stop() : start())
 })
 
-const StartStop = ({ started, toggle }) => (
-  <label>
-    <span>Start</span>
-    <input type="checkbox" checked={started} name="start" onChange={() => toggle(started)}/>
-  </label>
-)
+class StartStop extends React.Component {
+  constructor (props) {
+    super(props)
+    this.toggle = (e) => {
+      if (e.keyCode === 32) {
+        e.preventDefault()
+        this.props.toggle(this.props.started)
+      }
+    }
+  }
+  componentWillMount () {
+    document.addEventListener('keydown', this.toggle)
+  }
+
+  render () {
+    const { started, toggle } = this.props
+    return (
+      <label>
+        <span>Start</span>
+        <input type="checkbox" checked={started} name="start" onChange={() => toggle(started)}/>
+      </label>
+    )
+  }
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(StartStop)
