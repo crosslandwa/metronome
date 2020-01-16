@@ -5,3 +5,31 @@
 .input--uncommited {
   background-color: #DDD;
 }
+
+.counter {
+  width: 100%;
+  padding: 1em 0;
+}
+
+.counter__unit {
+  height: 2em;
+  max-width: 2em;
+  width: 5%;
+  background-color: #DDD;
+  border-radius: 0.25em;
+  border: solid 1px #DDD;
+  display: inline-block;
+  margin: 0 0.5%;
+}
+
+.counter__unit--active {
+  animation: pulse 0.2s;
+  background-color: #FC0;
+}
+
+@keyframes pulse
+    {
+      0%   {background: #FC0;}
+      50%  {background: #FFF;}
+      100% {background: #FC0;}
+    }
