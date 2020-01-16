@@ -7,12 +7,12 @@ const mapStateToProps = state => ({
   count: count(state)
 })
 
-const Counter = ({ accent, count }) => {console.log('render',count);return(
+const Counter = ({ accent, count }) => (
   <div class="counter">
-    {[...Array(accent).keys()].map(x => x + 1).map(x => {console.log('unit',x);return(
+    {[...Array(accent).keys()].map(x => x + 1).map(x => (
       <div class={`counter__unit${(count === x) ? ' counter__unit--active' : ''}`} />
-    )})}
+    ))}
   </div>
-)}
+)
 
 export default connect(mapStateToProps)(Counter)
