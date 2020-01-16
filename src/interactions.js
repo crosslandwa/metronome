@@ -46,9 +46,32 @@ export const reducer = (state = initialState, action) => {
     case 'STOP':
       return { ...state, count: undefined }
     case 'TICK':
-      return { ...state, count: state.count > 0 ? ((state.count % state.accent.value) + 1) : state.count }
+      return state.count
+        ? { ...state, count: (state.count % state.accent.value) + 1 }
+        : state
     case 'UPDATE_PARAM':
       return { ...state, ...editable(action.param, action.value) }
   }
   return state
+}
+
+// ---------- MIDDLEWARE ----------
+let handle
+export const middleware = store => next => action => {
+  switch (action.type) {
+    case 'START':
+    case 'TICK':
+      handle = setTimeout(
+        () => {
+          if (count(store.getState()) > 0) {
+            store.dispatch(tick())
+          }
+        },
+        (60 / bpm(store.getState())) * 1000
+      )
+      break
+    case 'STOP':
+      clearTimeout(handle)
+  }
+  return next(action)
 }

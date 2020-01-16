@@ -23,13 +23,5 @@
 }
 
 .counter__unit--active {
-  animation: pulse 0.2s;
   background-color: #FC0;
 }
-
-@keyframes pulse
-    {
-      0%   {background: #FC0;}
-      50%  {background: #FFF;}
-      100% {background: #FC0;}
-    }
