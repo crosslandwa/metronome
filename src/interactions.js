@@ -9,6 +9,7 @@ export const resetAccent = () => resetParam('accent')
 export const resetBpm = () => resetParam('bpm')
 export const start = () => ({ type: 'START' })
 export const stop = () => ({ type: 'STOP' })
+export const tick = () => ({ type: 'TICK' })
 const updateParam = (param, value) => ({ type: 'UPDATE_PARAM', param, value })
 export const updateAccent = value => updateParam('accent', bounded(1, 16, value))
 export const updateBpm = value => updateParam('bpm', bounded(20, 300, value))
@@ -44,6 +45,8 @@ export const reducer = (state = initialState, action) => {
       return { ...state, count: 1 }
     case 'STOP':
       return { ...state, count: undefined }
+    case 'TICK':
+      return { ...state, count: state.count > 0 ? ((state.count % state.accent.value) + 1) : state.count }
     case 'UPDATE_PARAM':
       return { ...state, ...editable(action.param, action.value) }
   }

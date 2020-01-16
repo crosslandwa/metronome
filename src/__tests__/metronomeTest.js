@@ -11,6 +11,7 @@ import {
   resetBpm,
   start,
   stop,
+  tick,
   updateAccent,
   updateBpm
 } from '../interactions'
@@ -42,6 +43,35 @@ describe('Metronome', () => {
       const store = createStore()
       store.dispatch(start())
       store.dispatch(stop())
+      expect(count(store.getState())).toEqual(undefined)
+    })
+
+    it('advances the count each tick when metronome is started', () => {
+      const store = createStore()
+      store.dispatch(start())
+      expect(count(store.getState())).toEqual(1)
+      store.dispatch(tick())
+      expect(count(store.getState())).toEqual(2)
+      store.dispatch(tick())
+      expect(count(store.getState())).toEqual(3)
+      store.dispatch(tick())
+      expect(count(store.getState())).toEqual(4)
+    })
+
+    it('count is bound by the accent', () => {
+      const store = createStore()
+      store.dispatch(start()) // 1
+      store.dispatch(tick()) // 2
+      store.dispatch(tick()) // 3
+      store.dispatch(tick()) // 4
+      store.dispatch(tick()) // 1
+      expect(count(store.getState())).toEqual(1)
+    })
+
+    it('count is not advanced each tick when metronome is not running', () => {
+      const store = createStore()
+      store.dispatch(tick())
+      store.dispatch(tick())
       expect(count(store.getState())).toEqual(undefined)
     })
   })
