@@ -77,6 +77,15 @@ describe('Metronome', () => {
       expect(count(store.getState())).toEqual(2)
     })
 
+    it('count is bound by the accent and immediately jumps to max when count is an exact multiple of accent', async () => {
+      const store = createStore()
+      await store.dispatch(start()) // 1
+      times(3, () => store.dispatch(tick())) // 2, 3, 4
+      expect(count(store.getState())).toEqual(4)
+      store.dispatch(updateAccent(2))
+      expect(count(store.getState())).toEqual(2)
+    })
+
     it('count is not advanced each tick when metronome is not running', () => {
       const store = createStore()
       store.dispatch(tick())

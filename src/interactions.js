@@ -1,6 +1,7 @@
 import { initialise, play, schedule } from './audio'
 
 const bounded = (min, max, value) => Math.max(min, Math.min(value, max))
+const then = (x, f) => f(x)
 
 // ---------- ACTIONS ----------
 const editParam = (param, value) => ({ type: 'EDIT_PARAM', param, value })
@@ -60,7 +61,9 @@ export const reducer = (state = initialState, action) => {
       return {
         ...state,
         ...editable(action.param, action.value),
-        count: (state.count && action.param === 'accent') ? state.count % action.value : state.count
+        count: (state.count && action.param === 'accent')
+          ? then(state.count % action.value, x => x === 0 ? action.value : x)
+          : state.count
       }
   }
   return state
