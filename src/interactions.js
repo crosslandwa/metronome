@@ -1,3 +1,5 @@
+import { initialise, schedule } from './audio'
+
 const bounded = (min, max, value) => Math.max(min, Math.min(value, max))
 
 // ---------- ACTIONS ----------
@@ -13,7 +15,7 @@ export const tick = () => ({ type: 'TICK' })
 const updateParam = (param, value) => ({ type: 'UPDATE_PARAM', param, value })
 export const updateAccent = value => updateParam('accent', bounded(1, 16, value))
 export const updateBpm = value => updateParam('bpm', bounded(20, 300, value))
-
+const audioInitialised = () => ({ type: 'AUDIO_INITIALISED' })
 // ---------- SELECTORS ----------
 const displayFrom = editable => editable.display
 const actualFrom = editable => editable.value
@@ -24,6 +26,8 @@ export const bpm = state => actualFrom(state.bpm)
 export const bpmDisplay = state => displayFrom(state.bpm)
 export const count = state => state.count
 
+const isAudioInitialised = state => state.audioInitialised
+
 // ---------- REDUCER ----------
 const editable = (param, initialValue) => ({ [param]: { display: initialValue, value: initialValue } })
 const edit = (editable, newValue) => ({ display: newValue, value: editable.value })
@@ -32,11 +36,14 @@ const reset = (editable) => ({ display: editable.value, value: editable.value })
 const initialState = {
   count: undefined,
   ...editable('accent', 4),
-  ...editable('bpm', 120)
+  ...editable('bpm', 120),
+  audioInitialised: false
 }
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
+    case 'AUDIO_INITIALISED':
+      return { ...state, audioInitialised: true }
     case 'EDIT_PARAM':
       return { ...state, [action.param]: edit(state[action.param], action.value) }
     case 'RESET_PARAM':
@@ -60,12 +67,17 @@ export const reducer = (state = initialState, action) => {
 }
 
 // ---------- MIDDLEWARE ----------
-let handle
+let cancel
 export const middleware = store => next => action => {
   switch (action.type) {
     case 'START':
+      if (!isAudioInitialised(store.getState())) {
+        initialise()
+        next(audioInitialised())
+      }
+      // falls through
     case 'TICK':
-      handle = setTimeout(
+      cancel = schedule(
         () => {
           if (count(store.getState()) > 0) {
             store.dispatch(tick())
@@ -75,7 +87,7 @@ export const middleware = store => next => action => {
       )
       break
     case 'STOP':
-      clearTimeout(handle)
+      cancel && cancel()
   }
   return next(action)
 }
