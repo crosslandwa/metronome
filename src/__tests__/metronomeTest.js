@@ -35,9 +35,9 @@ describe('Metronome', () => {
   })
 
   describe('running', () => {
-    it('can be started', () => {
+    it('can be started', async () => {
       const store = createStore()
-      store.dispatch(start())
+      await store.dispatch(start())
       expect(count(store.getState())).toEqual(1)
     })
 
@@ -48,9 +48,9 @@ describe('Metronome', () => {
       expect(count(store.getState())).toEqual(undefined)
     })
 
-    it('advances the count each tick when metronome is started', () => {
+    it('advances the count each tick when metronome is started', async () => {
       const store = createStore()
-      store.dispatch(start())
+      await store.dispatch(start())
       expect(count(store.getState())).toEqual(1)
       store.dispatch(tick())
       expect(count(store.getState())).toEqual(2)
@@ -60,17 +60,17 @@ describe('Metronome', () => {
       expect(count(store.getState())).toEqual(4)
     })
 
-    it('count is bound by the accent', () => {
+    it('count is bound by the accent', async () => {
       const store = createStore()
-      store.dispatch(start()) // 1
+      await store.dispatch(start()) // 1
       times(4, () => store.dispatch(tick())) // 2, 3, 4, 1
       expect(count(store.getState())).toEqual(1)
     })
 
-    it('count is bound by the accent and immediately jumps to a new count when accent < count', () => {
+    it('count is bound by the accent and immediately jumps to a new count when accent < count', async () => {
       const store = createStore()
       store.dispatch(updateAccent(12))
-      store.dispatch(start()) // 1
+      await store.dispatch(start()) // 1
       times(9, () => store.dispatch(tick())) // 2, 3, ..., 11
       expect(count(store.getState())).toEqual(10)
       store.dispatch(updateAccent(4))

@@ -72,22 +72,33 @@ export const middleware = store => next => action => {
   switch (action.type) {
     case 'START':
       if (!isAudioInitialised(store.getState())) {
-        initialise()
-        next(audioInitialised())
+        return initialiseAudio()
+          .then(() => { next(audioInitialised()) })
+          .then(() => scheduleTick(store.getState, store.dispatch))
+          .then(c => { cancel = c })
+          .then(() => next(action))
       }
-      // falls through
+      // fall through
     case 'TICK':
-      cancel = schedule(
-        () => {
-          if (count(store.getState()) > 0) {
-            store.dispatch(tick())
-          }
-        },
-        (60 / bpm(store.getState())) * 1000
-      )
+      scheduleTick(store.getState, store.dispatch).then(c => { cancel = c })
       break
     case 'STOP':
       cancel && cancel()
   }
   return next(action)
+}
+
+const initialiseAudio = async () => {
+  return initialise()
+}
+
+const scheduleTick = async (getState, dispatch) => {
+  return schedule(
+    () => {
+      if (count(getState()) > 0) {
+        dispatch(tick())
+      }
+    },
+    (60 / bpm(getState())) * 1000
+  )
 }

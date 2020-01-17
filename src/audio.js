@@ -1,5 +1,26 @@
 let audioContext
 
+export const initialise = async () => {
+  if (!(window && window.AudioContext)) return Promise.resolve()
+
+  audioContext = new window.AudioContext()
+  await loadSample('accented.wav', audioContext)
+  return Promise.resolve()
+}
+
+async function loadSample (assetUrl, context, done) {
+  // TODO implement
+  // const request = new XMLHttpRequest()
+  // request.open('GET', assetUrl, true)
+  // request.responseType = 'arraybuffer'
+  // request.onload = function () {
+  //   context.decodeAudioData(request.response, done)
+  // }
+  // request.send()
+}
+
+export const schedule = (callback, whenMs) => (audioContext ? scheduleWithWebAudioAPI(audioContext) : scheduleWithSetTimeout)(callback, whenMs)
+
 const scheduleWithWebAudioAPI = context => (callback, whenMs) => {
   let source = context.createBufferSource()
   let now = context.currentTime
@@ -24,8 +45,3 @@ const scheduleWithSetTimeout = (callback, whenMs) => {
     clearTimeout(handle)
   }
 }
-
-export const initialise = () => {
-  audioContext = window && window.AudioContext && new window.AudioContext()
-}
-export const schedule = (callback, whenMs) => (audioContext ? scheduleWithWebAudioAPI(audioContext) : scheduleWithSetTimeout)(callback, whenMs)
