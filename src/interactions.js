@@ -50,7 +50,11 @@ export const reducer = (state = initialState, action) => {
         ? { ...state, count: (state.count % state.accent.value) + 1 }
         : state
     case 'UPDATE_PARAM':
-      return { ...state, ...editable(action.param, action.value) }
+      return {
+        ...state,
+        ...editable(action.param, action.value),
+        count: (state.count && action.param === 'accent') ? state.count % action.value : state.count
+      }
   }
   return state
 }

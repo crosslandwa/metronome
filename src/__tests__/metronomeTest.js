@@ -16,6 +16,8 @@ import {
   updateBpm
 } from '../interactions'
 
+const times = (n, f) => [...Array(n).keys()].forEach(f)
+
 describe('Metronome', () => {
   describe('at initialisation', () => {
     it('every 4th beat is accented', () => {
@@ -61,11 +63,18 @@ describe('Metronome', () => {
     it('count is bound by the accent', () => {
       const store = createStore()
       store.dispatch(start()) // 1
-      store.dispatch(tick()) // 2
-      store.dispatch(tick()) // 3
-      store.dispatch(tick()) // 4
-      store.dispatch(tick()) // 1
+      times(4, () => store.dispatch(tick())) // 2, 3, 4, 1
       expect(count(store.getState())).toEqual(1)
+    })
+
+    it('count is bound by the accent and immediately jumps to a new count when accent < count', () => {
+      const store = createStore()
+      store.dispatch(updateAccent(12))
+      store.dispatch(start()) // 1
+      times(9, () => store.dispatch(tick())) // 2, 3, ..., 11
+      expect(count(store.getState())).toEqual(10)
+      store.dispatch(updateAccent(4))
+      expect(count(store.getState())).toEqual(2)
     })
 
     it('count is not advanced each tick when metronome is not running', () => {
