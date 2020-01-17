@@ -1,4 +1,4 @@
-import { initialise, schedule } from './audio'
+import { initialise, play, schedule } from './audio'
 
 const bounded = (min, max, value) => Math.max(min, Math.min(value, max))
 
@@ -76,11 +76,12 @@ export const middleware = store => next => action => {
           .then(() => { next(audioInitialised()) })
           .then(() => scheduleTick(store.getState, store.dispatch))
           .then(c => { cancel = c })
+          .then(playTick(store.getState))
           .then(() => next(action))
       }
       // fall through
     case 'TICK':
-      scheduleTick(store.getState, store.dispatch).then(c => { cancel = c })
+      scheduleTick(store.getState, store.dispatch).then(c => { cancel = c }).then(playTick(store.getState))
       break
     case 'STOP':
       cancel && cancel()
@@ -101,4 +102,9 @@ const scheduleTick = async (getState, dispatch) => {
     },
     (60 / bpm(getState())) * 1000
   )
+}
+
+const playTick = (getState) => () => {
+  const accented = count(getState()) === 1
+  play(accented)
 }

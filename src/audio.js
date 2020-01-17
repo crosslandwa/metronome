@@ -1,22 +1,26 @@
 let audioContext
+let accentedBuffer
+let tickBuffer
 
 export const initialise = async () => {
   if (!(window && window.AudioContext)) return Promise.resolve()
 
   audioContext = new window.AudioContext()
-  await loadSample('accented.wav', audioContext)
+  accentedBuffer = await loadSample('accented.mp3', audioContext)
+  tickBuffer = await loadSample('tick.mp3', audioContext)
   return Promise.resolve()
 }
 
-async function loadSample (assetUrl, context, done) {
-  // TODO implement
-  // const request = new XMLHttpRequest()
-  // request.open('GET', assetUrl, true)
-  // request.responseType = 'arraybuffer'
-  // request.onload = function () {
-  //   context.decodeAudioData(request.response, done)
-  // }
-  // request.send()
+async function loadSample (url, context) {
+  return new Promise(resolve => {
+    const request = new XMLHttpRequest()
+    request.open('GET', url, true)
+    request.responseType = 'arraybuffer'
+    request.onload = function () {
+      context.decodeAudioData(request.response, resolve)
+    }
+    request.send()
+  })
 }
 
 export const schedule = (callback, whenMs) => (audioContext ? scheduleWithWebAudioAPI(audioContext) : scheduleWithSetTimeout)(callback, whenMs)
@@ -44,4 +48,13 @@ const scheduleWithSetTimeout = (callback, whenMs) => {
   return function cancel () {
     clearTimeout(handle)
   }
+}
+
+export const play = (accented = true) => {
+  if (!audioContext) return
+
+  const source = audioContext.createBufferSource()
+  source.connect(audioContext.destination)
+  source.buffer = accented ? accentedBuffer : tickBuffer
+  source.start()
 }

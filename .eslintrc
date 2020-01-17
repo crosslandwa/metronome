@@ -22,5 +22,8 @@
     "node": true,
     "jest": true
   },
+  "globals": {
+    "XMLHttpRequest": true
+  },
   "extends": "standard"
 }
