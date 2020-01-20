@@ -2,10 +2,18 @@ let audioContext
 let accentedBuffer
 let tickBuffer
 
-export const initialise = async () => {
-  if (!(window && window.AudioContext)) return Promise.resolve()
+// force audio context to start on IOS by playing a short bit of silence
+function forceAudioContextToStart (context) {
+  const source = context.createBufferSource()
+  source.buffer = context.createBuffer(1, 1, 22050)
+  source.connect(context.destination)
+  source.start(0)
+}
 
-  audioContext = new window.AudioContext()
+export const initialise = async () => {
+  if (!(window && (window.AudioContext || window.webkitAudioContext))) return Promise.resolve()
+  audioContext = new (window.AudioContext || window.webkitAudioContext)()
+  forceAudioContextToStart(audioContext)
   accentedBuffer = await loadSample('accented.mp3', audioContext)
   tickBuffer = await loadSample('tick.mp3', audioContext)
   return Promise.resolve()
