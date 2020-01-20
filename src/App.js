@@ -7,11 +7,11 @@ import './app.css'
 
 const App = () => (
   <>
-    <h1>Metronome</h1>
+    <h1 class="title">Metronome</h1>
     <StartStop />
+    <Counter />
     <BPM />
     <Accent />
-    <Counter />
   </>
 )
 

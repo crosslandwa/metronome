@@ -27,10 +27,21 @@ class StartStop extends React.Component {
   render () {
     const { started, toggle } = this.props
     return (
-      <label>
-        <span>Start</span>
-        <input type="checkbox" checked={started} name="start" onChange={() => toggle(started)}/>
-      </label>
+      <div class="square square--half square--max-20">
+        <div class="startstop__wrapper">
+          <input
+            id="start"
+            class="startstop__checkbox"
+            type="checkbox"
+            checked={started}
+            name="start"
+            onChange={() => toggle(started)}
+          />
+          <label for="start" class="startstop__label">
+            <span>Start and stop<br/>metronome</span>
+          </label>
+        </div>
+      </div>
     )
   }
 }

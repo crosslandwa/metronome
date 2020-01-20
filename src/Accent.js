@@ -14,18 +14,20 @@ const mapDispatchToProps = dispatch => ({
 })
 
 const Accent = ({ accent, edit, reset, uncommited, update }) => (
-  <label>
-    <span>Accent</span>
-    <input
-      class={uncommited && 'input--uncommited'}
-      type="number"
-      value={accent}
-      name="accent"
-      onKeyUp={update}
-      onChange={edit}
-      onBlur={reset}
-    />
-  </label>
+  <div>
+    <label>
+      <span>Accent</span>
+      <input
+        class={uncommited && 'input--uncommited'}
+        type="number"
+        value={accent}
+        name="accent"
+        onKeyUp={update}
+        onChange={edit}
+        onBlur={reset}
+      />
+    </label>
+  </div>
 )
 
 export default connect(mapStateToProps, mapDispatchToProps)(Accent)

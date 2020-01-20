@@ -14,18 +14,20 @@ const mapDispatchToProps = dispatch => ({
 })
 
 const BPM = ({ bpm, edit, reset, uncommited, update }) => (
-  <label>
-    <span>BPM</span>
-    <input
-      class={uncommited && 'input--uncommited'}
-      type="number"
-      name="bpm"
-      value={bpm}
-      onKeyUp={update}
-      onChange={edit}
-      onBlur={reset}
-    />
-  </label>
+  <div>
+    <label>
+      <span>BPM</span>
+      <input
+        class={uncommited && 'input--uncommited'}
+        type="number"
+        name="bpm"
+        value={bpm}
+        onKeyUp={update}
+        onChange={edit}
+        onBlur={reset}
+      />
+    </label>
+  </div>
 )
 
 export default connect(mapStateToProps, mapDispatchToProps)(BPM)
