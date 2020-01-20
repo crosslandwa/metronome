@@ -11,13 +11,30 @@
   margin: 0 0 1rem 0;
 }
 
-.input--uncommited {
-  background-color: #DDD;
+.numeric-input__wrapper {
+  margin-top: 2em;
+}
+
+.numeric-input {
+  padding: 0.5em;
+  font-size: 1.5em;
+  width: 4em;
+  cursor: pointer;
+}
+
+.numeric-input__label {
+  font-size: 1.5em;
+  padding-left: 1em;
+  cursor: pointer;
+}
+
+.numeric-input--uncommited {
+  background-color: #FC0;
 }
 
 .counter {
   width: 100%;
-  padding: 1em;
+  padding: 2em 1em 0 1em;
   display: flex;
   justify-content: space-between;
   box-sizing: border-box;

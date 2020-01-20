@@ -14,18 +14,19 @@ const mapDispatchToProps = dispatch => ({
 })
 
 const BPM = ({ bpm, edit, reset, uncommited, update }) => (
-  <div>
-    <label>
+  <div class="numeric-input__wrapper">
+    <input
+      id="bpm"
+      class={`numeric-input ${uncommited ? ' numeric-input--uncommited' : ''}`}
+      type="number"
+      name="bpm"
+      value={bpm}
+      onKeyUp={update}
+      onChange={edit}
+      onBlur={reset}
+    />
+    <label for="bpm" class="numeric-input__label">
       <span>BPM</span>
-      <input
-        class={uncommited && 'input--uncommited'}
-        type="number"
-        name="bpm"
-        value={bpm}
-        onKeyUp={update}
-        onChange={edit}
-        onBlur={reset}
-      />
     </label>
   </div>
 )

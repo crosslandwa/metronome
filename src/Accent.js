@@ -14,18 +14,19 @@ const mapDispatchToProps = dispatch => ({
 })
 
 const Accent = ({ accent, edit, reset, uncommited, update }) => (
-  <div>
-    <label>
+  <div class="numeric-input__wrapper">
+    <input
+      id="accent"
+      class={`numeric-input ${uncommited ? ' numeric-input--uncommited' : ''}`}
+      type="number"
+      value={accent}
+      name="accent"
+      onKeyUp={update}
+      onChange={edit}
+      onBlur={reset}
+    />
+    <label for="accent" class="numeric-input__label">
       <span>Accent</span>
-      <input
-        class={uncommited && 'input--uncommited'}
-        type="number"
-        value={accent}
-        name="accent"
-        onKeyUp={update}
-        onChange={edit}
-        onBlur={reset}
-      />
     </label>
   </div>
 )
