@@ -79,8 +79,8 @@ export const middleware = store => next => action => {
           .then(() => { next(audioInitialised()) })
           .then(() => scheduleTick(store.getState, store.dispatch))
           .then(c => { cancel = c })
-          .then(playTick(store.getState))
           .then(() => next(action))
+          .then(playTick(store.getState))
       }
       // fall through
     case 'TICK':
