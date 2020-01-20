@@ -36,7 +36,7 @@ body {
 }
 
 .numeric-input--uncommited {
-  background-color: #FC0;
+  background-color: #7AF;
 }
 
 .counter {
@@ -63,8 +63,8 @@ body {
 }
 
 .counter__unit--active {
-  background-color: #FC0;
-  box-shadow: 0 0 6px #FC0, inset 0 0 3px #555;
+  background-color: #7AF;
+  box-shadow: 0 0 6px #7AF, inset 0 0 3px #555;
 }
 
 .square {
@@ -99,7 +99,7 @@ body {
 
 .startstop__checkbox:focus + .startstop__label::before, .numeric-input:focus {
   outline: none;
-  box-shadow: 0 0 0 5px #FC0;
+  box-shadow: 0 0 0 5px #7AF;
 }
 
 .startstop__label {
@@ -134,13 +134,12 @@ body {
   content: "";
   opacity: 0;
   position: absolute;
-  transform: rotate(45deg);
   height: 90%;
   width: 90%;
   border-radius: 50%;
   border: solid 2px black;
   box-sizing: border-box;
-  background-color: #FC0;
+  background-color: #7AF;
   left: 5%;
   z-index: 1;
 }
