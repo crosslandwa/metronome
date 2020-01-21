@@ -12,7 +12,7 @@ export const resetAccent = () => resetParam('accent')
 export const resetBpm = () => resetParam('bpm')
 export const start = () => ({ type: 'START' })
 export const stop = () => ({ type: 'STOP' })
-export const tick = () => ({ type: 'TICK' })
+export const tick = (incrementCount = true) => ({ type: 'TICK', incrementCount })
 const updateParam = (param, value) => ({ type: 'UPDATE_PARAM', param, value })
 export const updateAccent = value => updateParam('accent', bounded(1, 16, value))
 export const updateBpm = value => updateParam('bpm', bounded(20, 300, value))
@@ -71,23 +71,30 @@ export const reducer = (state = initialState, action) => {
 
 // ---------- MIDDLEWARE ----------
 let cancel
+let lastPlayedAtMs
 export const middleware = store => next => action => {
   switch (action.type) {
     case 'START':
-      if (!isAudioInitialised(store.getState())) {
-        return initialiseAudio()
-          .then(() => { next(audioInitialised()) })
-          .then(() => scheduleTick(store.getState, store.dispatch))
-          .then(c => { cancel = c })
-          .then(() => next(action))
-          .then(playTick(store.getState))
-      }
-      // fall through
+      const afterAudioInitialised = isAudioInitialised(store.getState())
+        ? Promise.resolve()
+        : initialiseAudio().then(() => { next(audioInitialised()) })
+      return afterAudioInitialised
+        .then(() => next(action)) // causes count to increment to 1
+        .then(() => store.dispatch(tick(false))) // requests no increment of count on the first tick
     case 'TICK':
-      scheduleTick(store.getState, store.dispatch).then(c => { cancel = c }).then(playTick(store.getState))
-      break
+      if (action.incrementCount) {
+        next(action)
+      }
+      scheduleTick(
+        store.getState,
+        store.dispatch,
+        lastPlayedAtMs ? lastPlayedAtMs + ((60 / bpm(store.getState())) * 1000) : 0
+      )
+        .then(c => { cancel = c })
+      return
     case 'STOP':
       cancel && cancel()
+      lastPlayedAtMs = undefined
   }
   return next(action)
 }
@@ -96,18 +103,16 @@ const initialiseAudio = async () => {
   return initialise()
 }
 
-const scheduleTick = async (getState, dispatch) => {
+const scheduleTick = async (getState, dispatch, whenMs) => {
   return schedule(
-    () => {
+    (playedAtMs) => {
       if (count(getState()) > 0) {
-        dispatch(tick())
+        lastPlayedAtMs = playedAtMs
+        dispatch(tick(!!whenMs))
+        const accented = count(getState()) === 1
+        play(accented)
       }
     },
-    (60 / bpm(getState())) * 1000
+    whenMs
   )
-}
-
-const playTick = (getState) => () => {
-  const accented = count(getState()) === 1
-  play(accented)
 }

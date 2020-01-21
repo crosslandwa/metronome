@@ -36,14 +36,15 @@ export const schedule = (callback, whenMs) => (audioContext ? scheduleWithWebAud
 const scheduleWithWebAudioAPI = context => (callback, whenMs) => {
   let source = context.createBufferSource()
   let now = context.currentTime
-  let thousandth = context.sampleRate / 1000
-  let scheduledAt = now + (whenMs / 1000) - 0.001
+  let numberOfSamplesInOneMs = context.sampleRate / 1000
+  let scheduledAt = whenMs ? (whenMs / 1000) : now
   // a buffer length of 1 sample doesn't work on IOS, so use 1/1000th of a second
-  let buffer = context.createBuffer(1, thousandth, context.sampleRate)
-  source.addEventListener('ended', callback)
-  source.buffer = buffer
+  let oneMsBuffer = context.createBuffer(1, numberOfSamplesInOneMs, context.sampleRate)
+  // eslint-disable-next-line standard/no-callback-literal
+  source.addEventListener('ended', () => callback(scheduledAt * 1000))
+  source.buffer = oneMsBuffer
   source.connect(context.destination)
-  source.start(scheduledAt)
+  source.start(scheduledAt - 0.001)
 
   return function cancel () {
     source.removeEventListener('ended', callback)
@@ -52,7 +53,10 @@ const scheduleWithWebAudioAPI = context => (callback, whenMs) => {
 }
 
 const scheduleWithSetTimeout = (callback, whenMs) => {
-  const handle = setTimeout(callback, whenMs)
+  const now = new Date().getTime()
+  const scheduledAtMs = whenMs || now
+  const interval = whenMs ? whenMs - now : 0
+  const handle = setTimeout(() => callback(scheduledAtMs), interval)
   return function cancel () {
     clearTimeout(handle)
   }
