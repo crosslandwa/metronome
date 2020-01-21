@@ -1,4 +1,4 @@
-import { initialise, play, schedule } from './audio'
+import { initialise as initialiseAudio, play, scheduleAt, scheduleNow } from './audio'
 
 const bounded = (min, max, value) => Math.max(min, Math.min(value, max))
 const then = (x, f) => f(x)
@@ -12,7 +12,7 @@ export const resetAccent = () => resetParam('accent')
 export const resetBpm = () => resetParam('bpm')
 export const start = () => ({ type: 'START' })
 export const stop = () => ({ type: 'STOP' })
-export const tick = (incrementCount = true) => ({ type: 'TICK', incrementCount })
+export const tick = () => ({ type: 'TICK' })
 const updateParam = (param, value) => ({ type: 'UPDATE_PARAM', param, value })
 export const updateAccent = value => updateParam('accent', bounded(1, 16, value))
 export const updateBpm = value => updateParam('bpm', bounded(20, 300, value))
@@ -78,19 +78,17 @@ export const middleware = store => next => action => {
       const afterAudioInitialised = isAudioInitialised(store.getState())
         ? Promise.resolve()
         : initialiseAudio().then(() => { next(audioInitialised()) })
+
       return afterAudioInitialised
-        .then(() => next(action)) // causes count to increment to 1
-        .then(() => store.dispatch(tick(false))) // requests no increment of count on the first tick
+        .then(() => scheduleNow((playedAtMs) => {
+          lastPlayedAtMs = playedAtMs
+          play(true)
+          scheduleTick(store.getState, store.dispatch)
+        }))
+        .then(() => next(action))
     case 'TICK':
-      if (action.incrementCount) {
-        next(action)
-      }
-      scheduleTick(
-        store.getState,
-        store.dispatch,
-        lastPlayedAtMs ? lastPlayedAtMs + ((60 / bpm(store.getState())) * 1000) : 0
-      )
-        .then(c => { cancel = c })
+      next(action)
+      scheduleTick(store.getState, store.dispatch)
       return
     case 'STOP':
       cancel && cancel()
@@ -99,20 +97,16 @@ export const middleware = store => next => action => {
   return next(action)
 }
 
-const initialiseAudio = async () => {
-  return initialise()
-}
-
-const scheduleTick = async (getState, dispatch, whenMs) => {
-  return schedule(
+const scheduleTick = (getState, dispatch) => {
+  cancel = scheduleAt(
     (playedAtMs) => {
       if (count(getState()) > 0) {
         lastPlayedAtMs = playedAtMs
-        dispatch(tick(!!whenMs))
+        dispatch(tick())
         const accented = count(getState()) === 1
         play(accented)
       }
     },
-    whenMs
+    lastPlayedAtMs + ((60 / bpm(getState())) * 1000)
   )
 }

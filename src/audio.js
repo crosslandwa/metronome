@@ -31,7 +31,8 @@ async function loadSample (url, context) {
   })
 }
 
-export const schedule = (callback, whenMs) => (audioContext ? scheduleWithWebAudioAPI(audioContext) : scheduleWithSetTimeout)(callback, whenMs)
+export const scheduleAt = (callback, whenMs) => (audioContext ? scheduleWithWebAudioAPI(audioContext) : scheduleWithSetTimeout)(callback, whenMs)
+export const scheduleNow = (callback) => (audioContext ? scheduleWithWebAudioAPI(audioContext) : scheduleWithSetTimeout)(callback)
 
 const scheduleWithWebAudioAPI = context => (callback, whenMs) => {
   let source = context.createBufferSource()
@@ -44,7 +45,7 @@ const scheduleWithWebAudioAPI = context => (callback, whenMs) => {
   source.addEventListener('ended', () => callback(scheduledAt * 1000))
   source.buffer = oneMsBuffer
   source.connect(context.destination)
-  source.start(scheduledAt - 0.001)
+  source.start(scheduledAt)
 
   return function cancel () {
     source.removeEventListener('ended', callback)
