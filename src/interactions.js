@@ -74,7 +74,7 @@ let cancel
 let lastPlayedAtMs
 export const middleware = store => next => action => {
   switch (action.type) {
-    case 'START':
+    case 'START': {
       const afterAudioInitialised = isAudioInitialised(store.getState())
         ? Promise.resolve()
         : initialiseAudio().then(() => { next(audioInitialised()) })
@@ -86,6 +86,7 @@ export const middleware = store => next => action => {
           scheduleTick(store.getState, store.dispatch)
         }))
         .then(() => next(action))
+    }
     case 'TICK':
       next(action)
       scheduleTick(store.getState, store.dispatch)

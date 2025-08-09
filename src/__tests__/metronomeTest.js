@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import createStore from '../store'
 import {
   accent,

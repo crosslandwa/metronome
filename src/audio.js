@@ -41,7 +41,7 @@ const scheduleWithWebAudioAPI = context => (callback, whenMs) => {
   let scheduledAt = whenMs ? (whenMs / 1000) : now
   // a buffer length of 1 sample doesn't work on IOS, so use 1/1000th of a second
   let oneMsBuffer = context.createBuffer(1, numberOfSamplesInOneMs, context.sampleRate)
-  // eslint-disable-next-line standard/no-callback-literal
+
   source.addEventListener('ended', () => callback(scheduledAt * 1000))
   source.buffer = oneMsBuffer
   source.connect(context.destination)

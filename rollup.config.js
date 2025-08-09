@@ -1,9 +1,8 @@
-import babel from 'rollup-plugin-babel'
-import commonjs from 'rollup-plugin-commonjs'
-import postcss from 'rollup-plugin-postcss'
-import replace from 'rollup-plugin-replace'
-import resolve from 'rollup-plugin-node-resolve'
-import { uglify } from 'rollup-plugin-uglify'
+const babel = require('@rollup/plugin-babel')
+const commonjs = require('@rollup/plugin-commonjs')
+const postcss = require('rollup-plugin-postcss')
+const replace = require('@rollup/plugin-replace')
+const resolve = require('@rollup/plugin-node-resolve')
 
 const isProductionBuild = process.env.NODE_ENV === 'production'
 
@@ -16,38 +15,19 @@ module.exports = {
   },
   plugins: [
     replace({
+      preventAssignment: true,
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
-    babel({ runtimeHelpers: true }),
+    babel({
+      babelHelpers: 'runtime',
+      plugins: [
+        ["@babel/transform-runtime", { "regenerator": true }]
+      ]
+    }),
     resolve(),
-    commonjs({
-      include: 'node_modules/**',
-      namedExports: {
-        'node_modules/react/index.js': [
-          'Component',
-          'PureComponent',
-          'Fragment',
-          'Children',
-          'createElement',
-          'useContext',
-          'useEffect',
-          'useLayoutEffect',
-          'useMemo',
-          'useReducer',
-          'useRef'
-        ],
-        'node_modules/react-dom/index.js': [
-          'unstable_batchedUpdates'
-        ],
-        'node_modules/react-is/index.js': [
-          'isContextConsumer',
-          'isValidElementType'
-        ]
-      }
-    }),
+    commonjs(),
     postcss({
-      extensions: [ '.css' ]
-    }),
-    (isProductionBuild && uglify())
+      extensions: ['.css']
+    })
   ]
 }

@@ -23,7 +23,7 @@ Build the app (see above), then start the dev server via:
 
 ```bash
 # requires python3 to be available
-npm run devserver
+npm run dev-webserver
 ```
 
 Then navigate your browser to http://localhost:8000
