@@ -22,6 +22,7 @@ NODE_ENV=production npm run build
 Build the app (see above), then start the dev server via:
 
 ```bash
+# requires python3 to be available
 npm run devserver
 ```
 
@@ -50,3 +51,8 @@ Rollup is configured with the appropriate [Babel](https://babeljs.io/) plugins t
 
 - CSS can be imported in the app via `import 'My.css'` - Rollup is configured to bundle CSS into the built JS artefact
 - [Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) extension is configured out of the box (requires dev tools be installed in the browser)
+
+### Deployment
+
+This site is hosted on [Github Pages](https://crosslandwa.github.io/metronome). Deployment happens on commit to the `main` branch via a Github Action
+
