@@ -74,10 +74,49 @@ Generate a SVG logo - here's the markup for the current one
     </svg>
 ```
 
-Then grab the svg content as a base64 encoded string
+Then run the following in the dev tools to convert the SVG to a 64 x 64 pixel `.ico` file (which the browser will download via a prompt)
 
 ```js
-`data:image/svg+xml;base64,${btoa(new XMLSerializer().serializeToString(document.getElementById("logo")))}`
+const imageData = new XMLSerializer().serializeToString(document.getElementById("logo"))
+const img = document.createElement('img');
+img.onload = () => {
+  const canvas = document.createElement('canvas');
+  const SIZE_IN_PIXELS = 64
+  canvas.width = SIZE_IN_PIXELS;
+  canvas.height = SIZE_IN_PIXELS;
+  canvas.getContext('2d').drawImage(img, 0, 0, SIZE_IN_PIXELS, SIZE_IN_PIXELS);
+  canvas.toBlob(
+    (imgBlob) => {
+      const downloadLink = document.createElement("a");
+      downloadLink.href = URL.createObjectURL(new Blob(
+        [
+          new Uint8Array([0, 0, 1, 0]).buffer, // ico file header
+          new Uint8Array([1, 0]).buffer, // Indiciate 1 image [01, 00]
+          new Uint8Array([canvas.width]).buffer, // Image width
+          new Uint8Array([canvas.height]).buffer, // Image height
+          new Uint8Array([0]).buffer, // Specify no color palette [00]
+          new Uint8Array([0]).buffer, // Reserved space [00]
+          new Uint8Array([1, 0]).buffer, // Specify 1 color plane
+          new Uint8Array([32, 0]).buffer, // Specify 32 bits per pixel (bit depth)
+          new Uint32Array([imgBlob.size]).buffer, // Specify image size in bytes
+          new Uint32Array([22]).buffer, // Specify image offset in bytes
+          imgBlob
+        ],
+        { type: 'image/vnd.microsoft.icon' }
+      ));
+      downloadLink.download = "favicon.ico";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    },
+    'image/png'
+  );
+};
+console.log(`<link rel="shortcut icon" type="image/x-icon" href="data:image/svg+xml;base64,${btoa(imageData)}">`)
+img.src = URL.createObjectURL(new Blob([imageData], {type:"image/svg+xml;charset=utf-8"}));
 ```
 
+Finally
+- copy the `<link>` that is output to the console into the `<head>` of the HTML template (this includes an embedded svg favicon)
+- copy the downloaded file to `/dist/favicon.ico`
 Finally, place the generated string in the `href` attribute of the `<link rel="shortcut icon">` element in the `<head>` of the page
